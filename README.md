@@ -22,7 +22,7 @@ This directory is empty. Let's use `wget` to directly download data from a known
 
 Because we'll be transferring data, it's best practice to use a data transfer node (DTN). We can just ssh into one.
 ```bash
-ssh dtn
+ssh dtn1
 ```
 
 When we ssh into another node, it is common to end up in a home directory. Let's change all the way back into our practice dir and download some files.
@@ -34,9 +34,13 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_AS
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/013/425/GCF_000013425.1_ASM1342v1/GCF_000013425.1_ASM1342v1_protein.faa.gz
 ```
 
-Let's exit the dtn, move back to our original project directory, then uncompress the gzipped fasta reference sequence.
+Let's exit the dtn.
 ```bash
 exit
+```
+
+Let's move back to our original project directory, then uncompress the gzipped fasta reference sequence.
+```bash
 cd $SCRATCHDIR/bioinfo_practice
 gunzip data/reference/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
@@ -58,6 +62,10 @@ Let's access our slurm allocated node.
 ```bash
 ssh <node from above step>
 ```
+When we ssh into a node, it typically sets us in our home directory. Let's move back to our practice directory so we can do actual work:
+```bash
+cd $SCRATCHDIR/bioinfo_practice
+```
 
 We're interested in building a database from the _E. coli_ reference genome (GCF_000005845). Using `module load` we can make blast-plus available in our environment.
 
@@ -76,8 +84,7 @@ makeblastdb -in data/reference/GCF_000005845.2_ASM584v2_genomic.fna -dbtype nucl
 
 ```bash
 gunzip data/reference/GCF_000013425.1_ASM1342v1_protein.faa.gz
-module load blast-plus/2.12.0
-tblastn -query data/reference/GCF_000013425.1_ASM1342v1_protein.faa -evalue .1 -db data/derived/e_coli_db -out data/derived/results.txt -outfmt 6 > logs/tblastn.log 2>&1
+tblastn -query data/reference/GCF_000013425.1_ASM1342v1_protein.faa -evalue .1 -db data/derived/e_coli_db -out results/e_coli_s_aureus_tblastn_results.txt -outfmt 6 > logs/tblastn.log 2>&1
 ```
 
 ### Downloading and using pre-compiled binary software
@@ -90,10 +97,49 @@ Again, we'll use the dtn since we'll be downloading a potentially large amount o
 ssh dtn1
 mkdir -p ~/bin
 wget -P ~/bin/ https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz
-tar -xvzf ~/bin/sratoolkit.current-ubuntu64.tar.gz
+tar -xvzf ~/bin/sratoolkit.current-ubuntu64.tar.gz -C ~/bin
 ```
 
 Let's download some _S. aureus_ short read RNASeq data.
 ```bash
 ~/bin/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump --split-files SRR29481819 -O $SCRATCHDIR/bioinfo_practice/data/raw
 ```
+
+Assuming you've previously connected to the `salloc` node, then the dtn1 node, we're getting somewhat nested now!
+
+Let's exit the dtn1 node and see what node we're in:
+```bash
+exit
+```
+
+If we're still in our `salloc` node, we can keep working!
+
+Just as we previously loaded the BLAST-PLUS module, we can unload it.
+```bash
+module unload blast-plus/2.12.0
+```
+
+### Creating fastq QC statistics and transferring locally with scp
+
+Let's load fastqc.
+```bash
+module load fastqc/0.11.9
+fastqc -o $SCRATCHDIR/bioinfo_practice/results $SCRATCHDIR/bioinfo_practice/data/raw/SRR29481819_1.fastq $SCRATCHDIR/bioinfo_practice/data/raw/SRR29481819_2.fastq
+```
+Finally, to transfer the html files for visualization on your local device, let's use secure copy (scp).
+
+> [!NOTE]
+> _You'll need to have a working terminal set up on your local device. If you're having trouble don't worry, these files can also be found using OnDemand._
+
+From *your* device, go to a directory where you'd like to download the fastqc output (e.g., Downloads).
+```bash
+scp -r <your usename>@dtn2.isaac.utk.edu:/lustre/isaac/scratch/<your usename>/bioinfo_practice/results/\*html .
+```
+
+You'll be prompted again for your password.
+
+> [!NOTE]
+> _When using scp to transfer files to zsh (macOS), you need to escape all asterisks with backslashes_
+
+That completes the exercises, don't forget to exit the `salloc` node by using `exit`. Exiting twice is typically necessary to free up the node.
+

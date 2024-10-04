@@ -51,17 +51,13 @@ Let's see how many of the protein sequences from _S. aureus_ map closely to the 
 
 Previously, we accessed the dtn1 using `ssh` to transfer data on a node meant for data transfer. Now that we're interested in doing computing that may use more resources than typical login node activity, we need to use a compute node.
 
-Let's request a compute node using a `SLURM` command called `salloc`. This will let us interact directly with our job instead of sending it into the background to run.
+Let's request a compute node using a `SLURM` command called `srun`. This will let us interact directly with our job instead of sending it into the background to run.
 ```bash
-salloc --account ACF-UTK0011 --partition=short --qos=short --nodes=1 --ntasks=2 --mem=8G --time=0-03:00:00
+srun --account ACF-UTK0011 --partition=short --qos=short --nodes=1 --ntasks=2 --mem=8G --time=0-03:00:00 --pty /bin/bash
 ```
 > [!NOTE]
-> _The node this command outputs will be unique to each user, so copy the node your output produces._
+> _The node this command outputs will be unique to each user_
 
-Let's access our slurm allocated node.
-```bash
-ssh <node from above step>
-```
 When we ssh into a node, it typically sets us in our home directory. Let's move back to our practice directory so we can do actual work:
 ```bash
 cd $SCRATCHDIR/bioinfo_practice
@@ -112,7 +108,7 @@ Let's exit the dtn1 node and see what node we're in:
 exit
 ```
 
-If we're still in our `salloc` node, we can keep working!
+If we're still in our `srun` allocated node, we can keep working!
 
 Just as we previously loaded the BLAST-PLUS module, we can unload it.
 ```bash

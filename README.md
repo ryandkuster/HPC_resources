@@ -101,7 +101,7 @@ Let's download some _S. aureus_ short read RNASeq data.
 ~/bin/sratoolkit.3.1.1-ubuntu64/bin/fasterq-dump --split-files SRR29481819 -O $SCRATCHDIR/bioinfo_practice/data/raw
 ```
 
-Assuming you've previously connected to the `salloc` node, then the dtn1 node, we're getting somewhat nested now!
+Assuming you've previously connected to the `srun` allocated node, then the dtn1 node, we're getting somewhat nested now!
 
 Let's exit the dtn1 node and see what node we're in:
 ```bash
@@ -137,5 +137,5 @@ You'll be prompted again for your password.
 > [!NOTE]
 > _When using scp to transfer files to zsh (macOS), you need to escape all asterisks with backslashes_
 
-That completes the exercises, don't forget to exit the `salloc` node by using `exit`. Exiting twice is typically necessary to free up the node.
+That completes the exercises!
 

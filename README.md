@@ -8,4 +8,4 @@
 
 [ISAAC24 Migration](https://github.com/ryandkuster/HPC_resources/wiki/ISAAC24-Migration)
 
-(Bioinfo Monthly Meetings)[https://github.com/ryandkuster/HPC_resources/wiki/Bioinfo-Monthly-Meetings]
+[Bioinfo Monthly Meetings](https://github.com/ryandkuster/HPC_resources/wiki/Bioinfo-Monthly-Meetings)
